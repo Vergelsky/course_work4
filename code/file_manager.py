@@ -5,6 +5,7 @@ import json
 
 class FileManagerAbc(ABC):
     file_vacancy_name = os.path.join('src', 'vacancy.txt')
+    file_json_vacancy_name = os.path.join('src', 'vacancy.json')
 
     @abstractmethod
     def writhe_vacancy_to_file(self, vacancy):
@@ -39,4 +40,9 @@ class FileManager(FileManagerAbc):
             print("Такой вакансии в файле нет!")
 
     def save_vacancies_to_JSON(self, vacancies):
-
+        vac_list = []
+        for vac in vacancies:
+            vac_list.append(vac.gen_string())
+            vac_text = json.dumps(vac_list)
+        with open(self.file_json_vacancy_name, 'w') as file:
+            file.write(vac_text)
