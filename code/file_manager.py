@@ -3,12 +3,11 @@ import os
 from code.vacancy import Vacancy
 import json
 
+
 class FileManagerAbc(ABC):
-    file_vacancy_name = os.path.join('src', 'vacancy.txt')
-    file_json_vacancy_name = os.path.join('src', 'vacancy.json')
 
     @abstractmethod
-    def writhe_vacancy_to_file(self, vacancy):
+    def write_vacancies_to_file(self, vacancy):
         pass
 
     @abstractmethod
@@ -19,30 +18,58 @@ class FileManagerAbc(ABC):
     def del_vacancies_from_file(self, vacancy):
         pass
 
+
 class FileManager(FileManagerAbc):
-    def writhe_vacancy_to_file(self, vacancy):
-        with open(self.file_vacancy_name, 'a') as file:
-            file.write(vacancy.gen_string())
+    file_json_vacancy_name = os.path.join('src', 'vacancy.json')
+
+    def write_vacancies_to_file(self, vacancies):
+        """
+        Если файл не пустой - создаём список с его содежимым, если пустой - пустой список.
+        Добавляем туда список полей каждой вакансии из vacancies по-очереди.
+        Перезаписываем файл.
+        :param vacancies: Список вакансий.
+        :return: Ничего.
+        """
+        with open(self.file_json_vacancy_name, 'r+') as file:
+            text = file.read()
+            if text:
+                data = list(json.loads(text))
+            else:
+                data = []
+
+            for vac in vacancies:
+                data.append({'date': vac.date,
+                             'title': vac.title,
+                             'employer': vac.employer,
+                             'salary': vac.salary,
+                             'description': vac.description,
+                             'url': vac.url})
+            file.seek(0)
+            file.write(json.dumps(data, indent=4, ensure_ascii=False))
 
     def read_vacancies_from_file(self):
-        with open(self.file_vacancy_name, 'r') as file:
-            text = file.readlines()
+        """
+        Читаем из файла список словарей, из каждого словаря создаём объект вакансии
+        и складываем в одну переменную.
+        :return: Список вакансий
+        """
         vacancies = []
-        for line in text:
-            vacancies.append(Vacancy(*line))
+        with open(self.file_json_vacancy_name, 'r') as file:
+            text = file.read()
+            j_text = json.loads(text)
+            for line in j_text:
+                vacancies.append(Vacancy(line['date'],
+                                         line['title'],
+                                         line['employer'],
+                                         line['salary'],
+                                         line['salary'],
+                                         line['description'],
+                                         line['url']))
         return vacancies
 
     def del_vacancies_from_file(self, vacancy):
-        vacanvies = self.read_vacancies_from_file()
-        if vacancy in vacanvies:
-            vacanvies.remove(vacancy)
+        vacancies = self.read_vacancies_from_file()
+        if vacancy in vacancies:
+            vacancies.remove(vacancy)
         else:
             print("Такой вакансии в файле нет!")
-
-    def save_vacancies_to_JSON(self, vacancies):
-        vac_list = []
-        for vac in vacancies:
-            vac_list.append(vac.gen_string())
-            vac_text = json.dumps(vac_list)
-        with open(self.file_json_vacancy_name, 'w') as file:
-            file.write(vac_text)

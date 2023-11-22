@@ -1,5 +1,5 @@
 import datetime
-
+import json
 
 class Vacancy:
     def __init__(self, date, title, employer, salary_min, salary_max, description, url):
@@ -32,7 +32,3 @@ class Vacancy:
 
     def __gt__(self, other):
         return self.salary > other.salary
-
-
-    def gen_string(self):
-        return f"[{self.date}, {self.title}, {self.employer}, {self.salary}, {self.description}, {self.url}]"

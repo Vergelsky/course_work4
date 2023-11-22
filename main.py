@@ -6,6 +6,7 @@ from datetime import datetime
 hh_api = HeadHunterAPI()
 sj_api = SuperJobAPI()
 
+
 def create_vacancies(request, per_page=100):
     vacancies_list = []
     per_page = per_page if per_page <= 100 else 100
@@ -33,14 +34,31 @@ def create_vacancies(request, per_page=100):
                                       item['link']))
     return vacancies_list
 
+
 if __name__ == '__main__':
-    print("Какую работу искать?")
-    request_text = input()
-    print("Сколько вариантов найти?")
-    per_page = int(input())//2
 
-    vacancies = create_vacancies(request_text, per_page)
+    while True:
+        print("Какую работу искать? (1 - открыть сохранённый поиск)")
+        search_text = input()
+        if search_text == '1':
+            fm = FileManager()
+            vacancies = fm.read_vacancies_from_file()
+            print("Сохранённый поиск:")
+        else:
+            print("Сколько вариантов найти?")
+            request_text = input()
+            if request_text:
+                per_page = int(request_text) // 2
+            else:
+                per_page = 20
+            vacancies = create_vacancies(search_text, per_page)
+        for vac in vacancies:
+            print(vac)
 
-    for vac in vacancies:
-        print(vac)
-
+        print("Сохранить или новый поиск? (1 - сохранить, 0 - новый поиск)")
+        request_text = int(input())
+        if request_text:
+            f = FileManager()
+            f.write_vacancies_to_file(vacancies)
+        else:
+            continue
