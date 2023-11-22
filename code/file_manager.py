@@ -56,20 +56,27 @@ class FileManager(FileManagerAbc):
         vacancies = []
         with open(self.file_json_vacancy_name, 'r') as file:
             text = file.read()
-            j_text = json.loads(text)
-            for line in j_text:
-                vacancies.append(Vacancy(line['date'],
-                                         line['title'],
-                                         line['employer'],
-                                         line['salary'],
-                                         line['salary'],
-                                         line['description'],
-                                         line['url']))
+            if text:
+                j_text = json.loads(text)
+                for line in j_text:
+                    vacancies.append(Vacancy(line['date'],
+                                             line['title'],
+                                             line['employer'],
+                                             line['salary'],
+                                             line['salary'],
+                                             line['description'],
+                                             line['url']))
+            else:
+                vacancies = -1
         return vacancies
 
     def del_vacancies_from_file(self, vacancy):
         vacancies = self.read_vacancies_from_file()
         if vacancy in vacancies:
             vacancies.remove(vacancy)
-        else:
-            print("Такой вакансии в файле нет!")
+            self.clean_the_file()
+            self.write_vacancies_to_file(vacancies)
+
+    def clean_the_file(self):
+        with open(self.file_json_vacancy_name, "w"):
+            pass
