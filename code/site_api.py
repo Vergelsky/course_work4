@@ -3,10 +3,12 @@ import os
 import requests
 import json
 
+
 class SiteAPI(ABC):
     @abstractmethod
     def load_vacancy(self, keyword):
         pass
+
 
 class HeadHunterAPI(SiteAPI):
     url_hh = "https://api.hh.ru/vacancies/"
@@ -17,7 +19,7 @@ class HeadHunterAPI(SiteAPI):
         :param per_page: количество результатов
         :return:
         """
-        response = requests.get(self.url_hh, params={"text": keyword, "per_page": per_page})
+        response = requests.get(self.url_hh, params={"text": keyword, "per_page": per_page, 'order_by': 'salary_desc'})
 
         response_dict = json.loads(response.text)
 
@@ -34,7 +36,7 @@ class SuperJobAPI(SiteAPI):
         :param per_page: количество результатов
         :return:
         """
-        response = requests.get(self.url_sj, params={"keyword": keyword, "count": per_page})
+        response = requests.get(self.url_sj, params={"keyword": keyword, "count": per_page, 'no_agreement': 1}, headers={"X-Api-App-Id": self.api_key_sj})
 
         response_dict = json.loads(response.text)
 

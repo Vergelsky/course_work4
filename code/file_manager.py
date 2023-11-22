@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 import os
-from vacancy import Vacancy
+from code.vacancy import Vacancy
 import json
 
 class FileManagerAbc(ABC):
@@ -14,6 +14,9 @@ class FileManagerAbc(ABC):
     def read_vacancies_from_file(self):
         pass
 
+    @abstractmethod
+    def del_vacancies_from_file(self, vacancy):
+        pass
 
 class FileManager(FileManagerAbc):
     def writhe_vacancy_to_file(self, vacancy):
@@ -25,4 +28,15 @@ class FileManager(FileManagerAbc):
             text = file.readlines()
         vacancies = []
         for line in text:
-            vacancies.append(Vacancy(line))
+            vacancies.append(Vacancy(*line))
+        return vacancies
+
+    def del_vacancies_from_file(self, vacancy):
+        vacanvies = self.read_vacancies_from_file()
+        if vacancy in vacanvies:
+            vacanvies.remove(vacancy)
+        else:
+            print("Такой вакансии в файле нет!")
+
+    def save_vacancies_to_JSON(self, vacancies):
+
