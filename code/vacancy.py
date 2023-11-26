@@ -1,5 +1,4 @@
 import datetime
-import json
 
 class Vacancy:
     def __init__(self, date, title, employer, salary_min, salary_max, description, url):

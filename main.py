@@ -14,7 +14,12 @@ def create_vacancies(request, per_page=100):
     hh_response = hh_api.load_vacancy(request, per_page)['items']
 
     for item in hh_response:
-        vacancies_list.append(Vacancy(datetime.fromisoformat(item['published_at']).timestamp(),
+        try:
+            date = datetime.fromisoformat(item['published_at']).timesamp()
+        except ValueError:
+            print("Ошибка при загрузке данных с hh.ru, вакансии не были загружены.")
+            break
+        vacancies_list.append(Vacancy(date,
                                       item['name'],
                                       item['employer']['name'],
                                       item['salary']['from'],
